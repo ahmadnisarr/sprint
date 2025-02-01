@@ -5,9 +5,11 @@ import os
 DB_FILE = "jobs.db"
 JOBS_FILE = "rapid_jobs2.json"
 
+
 def database_exists():
     """Checks if the database file exists."""
     return os.path.exists(DB_FILE)
+
 
 def create_database():
     """Creates the database and jobs table only if the database doesn't exist."""
@@ -18,7 +20,8 @@ def create_database():
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS jobs (
             id TEXT PRIMARY KEY,
             title TEXT NOT NULL,
@@ -30,11 +33,13 @@ def create_database():
             salaryRange TEXT,
             job_link TEXT NOT NULL
         )
-    """)
-    
+        """
+    )
+
     conn.commit()
     conn.close()
     print("Database and table created successfully.")
+
 
 def load_jobs():
     """Loads job data from JSON file."""
@@ -44,6 +49,7 @@ def load_jobs():
 
     with open(JOBS_FILE, "r", encoding="utf-8") as file:
         return json.load(file)
+
 
 def insert_jobs_into_db():
     """Reads job data and inserts it into the database while avoiding duplicates."""
@@ -74,15 +80,21 @@ def insert_jobs_into_db():
         job_link = job_links[0]["url"] if job_links else "No link available"
 
         # Insert job while avoiding duplicates
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT OR IGNORE INTO jobs 
-            (id, title, company, description, location, employmentType, datePosted, salaryRange, job_link)
+            (id, title, company, description, location, employmentType, datePosted, 
+            salaryRange, job_link)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (job_id, title, company, description, location, employment_type, date_posted, salary_range, job_link))
+            """,
+            (job_id, title, company, description, location, employment_type,
+             date_posted, salary_range, job_link)
+        )
 
     conn.commit()
     conn.close()
     print("Job data inserted successfully.")
+
 
 if __name__ == "__main__":
     create_database()  # Will only create if DB does not exist
