@@ -87,8 +87,17 @@ def insert_jobs_into_db():
             salaryRange, job_link)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (job_id, title, company, description, location, employment_type,
-             date_posted, salary_range, job_link)
+            (
+                job_id,
+                title,
+                company,
+                description,
+                location,
+                employment_type,
+                date_posted,
+                salary_range,
+                job_link,
+            )
         )
 
     conn.commit()
