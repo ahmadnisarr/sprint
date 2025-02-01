@@ -82,9 +82,7 @@ def insert_jobs_into_db():
         # Insert job while avoiding duplicates
         cursor.execute(
             """
-            INSERT OR IGNORE INTO jobs 
-            (id, title, company, description, location, employmentType, datePosted, 
-            salaryRange, job_link)
+            INSERT OR IGNORE INTO jobs (id, title, company, description, location, employmentType, datePosted, salaryRange, job_link)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
