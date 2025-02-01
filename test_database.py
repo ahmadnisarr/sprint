@@ -2,11 +2,12 @@ import sqlite3
 import json
 import os
 import pytest
-from database import create_database, insert_jobs_into_db, load_jobs, DB_FILE
+from database import create_database, insert_jobs_into_db, load_jobs
 
 # Use a temporary database for testing
 TEST_JOBS_FILE = "test_jobs.json"
 TEST_DB_FILE = "test_jobs.db"
+
 
 @pytest.fixture
 def setup_test_db(monkeypatch):
@@ -22,7 +23,8 @@ def setup_test_db(monkeypatch):
     cursor = conn.cursor()
 
     # Create table with updated schema
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS jobs (
             id TEXT PRIMARY KEY,
             title TEXT NOT NULL,
@@ -34,7 +36,8 @@ def setup_test_db(monkeypatch):
             salaryRange TEXT,
             job_link TEXT NOT NULL
         )
-    """)
+        """
+    )
 
     conn.commit()
     conn.close()
@@ -85,24 +88,21 @@ def test_load_jobs(create_test_json, monkeypatch):
     assert jobs[0]["title"] == "Staff Software Engineer, Risk"
     assert jobs[0]["company"] == "WEXWEXUS"
 
-    # Validate Last job
+    # Validate last job
     assert jobs[1]["id"] == "0cj12RMPoG9gnpZYAAAAAA=="
     assert jobs[1]["title"] == "Senior Software Engineer, Back End (Go, Java, AWS)"
     assert jobs[1]["company"] == "Capital One"
 
 
-
-
 # Second Test
 def test_database_insertion(setup_test_db):
     """Test if jobs are inserted correctly into the database."""
-    
     create_database()
     insert_jobs_into_db()
 
-    conn = sqlite3.connect(TEST_DB_FILE)  
+    conn = sqlite3.connect(TEST_DB_FILE)
     cursor = conn.cursor()
-    
+
     cursor.execute("SELECT COUNT(*) FROM jobs")
     count = cursor.fetchone()[0]
 
@@ -110,7 +110,7 @@ def test_database_insertion(setup_test_db):
     job_entry = cursor.fetchone()
 
     conn.close()
-    
+
     assert count > 0  # Ensure jobs are inserted
     assert job_entry is not None  # Ensure at least one entry exists
     assert all(job_entry)  # Ensure all fields have values
