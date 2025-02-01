@@ -38,7 +38,7 @@ def create_database():
 
     conn.commit()
     conn.close()
-    print("Database and table created successfully.")
+    print("Database and table-created successfully.")
 
 
 def load_jobs():
@@ -76,7 +76,7 @@ def insert_jobs_into_db():
         if not job_id or not title or not company:
             continue  # Skip invalid entries
 
-        # Choose the first available job link
+        # Choose the first available job link provider
         job_link = job_links[0]["url"] if job_links else "No link available"
 
         # Insert job while avoiding duplicates
