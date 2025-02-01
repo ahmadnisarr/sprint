@@ -5,8 +5,16 @@ import os
 DB_FILE = "jobs.db"
 JOBS_FILE = "rapid_jobs2.json"
 
+def database_exists():
+    """Checks if the database file exists."""
+    return os.path.exists(DB_FILE)
+
 def create_database():
-    """Creates the database and jobs table with updated attributes if not exists."""
+    """Creates the database and jobs table only if the database doesn't exist."""
+    if database_exists():
+        print("Database already exists. Skipping creation.")
+        return  # Exit if the database is already present
+
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
 
@@ -26,6 +34,7 @@ def create_database():
     
     conn.commit()
     conn.close()
+    print("Database and table created successfully.")
 
 def load_jobs():
     """Loads job data from JSON file."""
@@ -43,6 +52,7 @@ def insert_jobs_into_db():
         print("No jobs to insert.")
         return
 
+    print("Inserting job data into:", DB_FILE)
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
 
@@ -75,5 +85,5 @@ def insert_jobs_into_db():
     print("Job data inserted successfully.")
 
 if __name__ == "__main__":
-    create_database()
-    insert_jobs_into_db()
+    create_database()  # Will only create if DB does not exist
+    insert_jobs_into_db()  # Inserts job data, avoiding duplicates

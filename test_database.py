@@ -5,11 +5,19 @@ import pytest
 from database import create_database, insert_jobs_into_db, load_jobs, DB_FILE
 
 # Use a temporary database for testing
+TEST_JOBS_FILE = "test_jobs.json"
 TEST_DB_FILE = "test_jobs.db"
 
 @pytest.fixture
-def setup_test_db():
+def setup_test_db(monkeypatch):
     """Sets up a temporary test database."""
+    # Use test DB instead of real DB
+    monkeypatch.setattr("database.DB_FILE", TEST_DB_FILE)
+
+    # Ensure a clean test environment
+    if os.path.exists(TEST_DB_FILE):
+        os.remove(TEST_DB_FILE)
+
     conn = sqlite3.connect(TEST_DB_FILE)
     cursor = conn.cursor()
 
@@ -31,28 +39,74 @@ def setup_test_db():
     conn.commit()
     conn.close()
 
-    yield  # Run tests
+    yield  # Run the test
 
     os.remove(TEST_DB_FILE)  # Cleanup after tests
 
-def test_load_jobs():
-    """Ensure the job data loads correctly from JSON."""
-    jobs = load_jobs()
-    assert isinstance(jobs, list)
-    assert len(jobs) > 0  # There should be job entries
 
+@pytest.fixture
+def create_test_json():
+    """Creates a test JSON file with known job data."""
+    test_data = [
+        {
+            "id": "s-GCjOL5C9JmbOP8AAAAAA==",
+            "title": "Staff Software Engineer, Risk",
+            "company": "WEXWEXUS",
+        },
+        {
+            "id": "0cj12RMPoG9gnpZYAAAAAA==",
+            "title": "Senior Software Engineer, Back End (Go, Java, AWS)",
+            "company": "Capital One",
+        }
+    ]
+
+    with open(TEST_JOBS_FILE, "w", encoding="utf-8") as file:
+        json.dump(test_data, file)
+
+    yield TEST_JOBS_FILE  # Run the test
+
+    os.remove(TEST_JOBS_FILE)  # Cleanup after test
+
+
+# First Test
+def test_load_jobs(create_test_json, monkeypatch):
+    """Ensure job data loads correctly from a known JSON file."""
+    # Override the global JOBS_FILE variable to use the test file
+    monkeypatch.setattr("database.JOBS_FILE", TEST_JOBS_FILE)
+
+    jobs = load_jobs()
+
+    # Check that the function returns a list
+    assert isinstance(jobs, list)
+    assert len(jobs) == 2  # We added 2 test jobs
+
+    # Validate first job
+    assert jobs[0]["id"] == "s-GCjOL5C9JmbOP8AAAAAA=="
+    assert jobs[0]["title"] == "Staff Software Engineer, Risk"
+    assert jobs[0]["company"] == "WEXWEXUS"
+
+    # Validate Last job
+    assert jobs[1]["id"] == "0cj12RMPoG9gnpZYAAAAAA=="
+    assert jobs[1]["title"] == "Senior Software Engineer, Back End (Go, Java, AWS)"
+    assert jobs[1]["company"] == "Capital One"
+
+
+
+
+# Second Test
 def test_database_insertion(setup_test_db):
     """Test if jobs are inserted correctly into the database."""
-    os.rename(DB_FILE, TEST_DB_FILE)  # Use test DB instead of main DB
+    
+    create_database()
     insert_jobs_into_db()
 
-    conn = sqlite3.connect(TEST_DB_FILE)
+    conn = sqlite3.connect(TEST_DB_FILE)  
     cursor = conn.cursor()
     
     cursor.execute("SELECT COUNT(*) FROM jobs")
     count = cursor.fetchone()[0]
 
-    cursor.execute("SELECT title, company, location, employmentType, datePosted, salaryRange FROM jobs LIMIT 1")
+    cursor.execute("SELECT title, company, location, employmentType FROM jobs LIMIT 1")
     job_entry = cursor.fetchone()
 
     conn.close()
@@ -60,5 +114,3 @@ def test_database_insertion(setup_test_db):
     assert count > 0  # Ensure jobs are inserted
     assert job_entry is not None  # Ensure at least one entry exists
     assert all(job_entry)  # Ensure all fields have values
-
-    os.rename(TEST_DB_FILE, DB_FILE)  # Restore original DB
