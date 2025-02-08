@@ -41,7 +41,7 @@ def setup_test_db(monkeypatch):
             min_amount REAL,
             max_amount REAL,
             currency TEXT,
-            is_remote INTEGER CHECK (is_remote IN (0, 1)), 
+            is_remote INTEGER CHECK (is_remote IN (0, 1)),
             job_level TEXT,
             job_function TEXT,
             company_industry TEXT,
@@ -61,7 +61,7 @@ def setup_test_db(monkeypatch):
             salaryRange TEXT,
             image TEXT,
             job_link TEXT
-        );
+        )
         """
     )
 
@@ -143,3 +143,5 @@ def test_database_insertion(setup_test_db, create_test_json, monkeypatch):
     assert count == 2  # Ensure exactly 2 jobs are inserted
     assert job_entry is not None
     assert all(job_entry)
+
+# Ensure newline at end of file (Fix W292)

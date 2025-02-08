@@ -6,9 +6,11 @@ DB_FILE = "jobs.db"
 JOBS_FILE1 = "rapid_jobs2.json"
 JOBS_FILE2 = "jobs3.json"
 
+
 def database_exists():
     """Checks if the database file exists."""
     return os.path.exists(DB_FILE)
+
 
 def create_database():
     """Creates the database and jobs table only if the database doesn't exist."""
@@ -37,7 +39,7 @@ def create_database():
             min_amount REAL,
             max_amount REAL,
             currency TEXT,
-            is_remote INTEGER CHECK (is_remote IN (0, 1)), 
+            is_remote INTEGER CHECK (is_remote IN (0, 1)),
             job_level TEXT,
             job_function TEXT,
             company_industry TEXT,
@@ -57,13 +59,14 @@ def create_database():
             salaryRange TEXT,
             image TEXT,
             job_link TEXT
-        );
+        )
         """
     )
 
     conn.commit()
     conn.close()
     print("Database and table created successfully.")
+
 
 def data_inserted_for_rapidjobs_file(jobs):
     """Inserts job data into the database, ensuring no duplicates."""
@@ -115,14 +118,17 @@ def data_inserted_for_rapidjobs_file(jobs):
         cursor.execute(
             """
             INSERT OR IGNORE INTO jobs (
-                id, site, job_url, job_url_direct, title, company, location, 
-                job_type, employmentType, date_posted, salary_source, interval, 
-                min_amount, max_amount, currency, is_remote, job_level, job_function, 
-                company_industry, listing_type, emails, description, company_url, 
-                company_url_direct, company_addresses, company_num_employees, 
-                company_revenue, company_description, logo_photo_url, banner_photo_url, 
+                id, site, job_url, job_url_direct, title, company, location,
+                job_type, employmentType, date_posted, salary_source, interval,
+                min_amount, max_amount, currency, is_remote, job_level, job_function,
+                company_industry, listing_type, emails, description, company_url,
+                company_url_direct, company_addresses, company_num_employees,
+                company_revenue, company_description, logo_photo_url, banner_photo_url,
                 ceo_name, ceo_photo_url, salaryRange, job_link
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+            ) VALUES (
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+            )
             """,
             (
                 job_id, site, job_url, job_url_direct, title, company, location,
@@ -147,7 +153,8 @@ def load_jobs(JOBS_FILE):
         return []
     with open(JOBS_FILE, "r", encoding="utf-8") as file:
         return json.load(file)
-    
+
+
 def insert_jobs_into_db():
     """Reads job data and inserts it into the database while avoiding duplicates."""
     jobs1 = load_jobs(JOBS_FILE1)
