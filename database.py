@@ -13,7 +13,8 @@ def database_exists():
 
 
 def create_database():
-    """Creates the database and jobs table only if the database doesn't exist."""
+    """Creates the database and jobs table only if the database
+        doesn't exist."""
     if database_exists():
         print("Database already exists. Skipping creation.")
         return
@@ -83,7 +84,7 @@ def data_inserted_for_rapidjobs_file(jobs):
         location = job.get("location", "Not specified")
         job_type = job.get("job_type", "Not specified")
         employment_type = job.get("employmentType", "Not specified")
-        date_posted = job.get("datePosted") or job.get("date_posted") or "Not available"
+        date_posted = job.get("datePosted") or job.get("date_posted") or "Not"
         salary_source = job.get("salary_source", "Not disclosed")
         interval = job.get("interval", "Unknown")
         min_amount = job.get("min_amount", None)
@@ -120,23 +121,26 @@ def data_inserted_for_rapidjobs_file(jobs):
             INSERT OR IGNORE INTO jobs (
                 id, site, job_url, job_url_direct, title, company, location,
                 job_type, employmentType, date_posted, salary_source, interval,
-                min_amount, max_amount, currency, is_remote, job_level, job_function,
-                company_industry, listing_type, emails, description, company_url,
+                min_amount,max_amount,currency,is_remote,job_level,job_function,
+                company_industry,listing_type,emails,description,company_url,
                 company_url_direct, company_addresses, company_num_employees,
-                company_revenue, company_description, logo_photo_url, banner_photo_url,
-                ceo_name, ceo_photo_url, salaryRange, job_link
+                company_revenue,company_description,logo_photo_url,
+                banner_photo_url,ceo_name,ceo_photo_url,salaryRange,
+                job_link
             ) VALUES (
                 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
             )
             """,
             (
-                job_id, site, job_url, job_url_direct, title, company, location,
-                job_type, employment_type, date_posted, salary_source, interval,
-                min_amount, max_amount, currency, is_remote, job_level, job_function,
-                company_industry, listing_type, emails, description, company_url,
+                job_id, site, job_url, job_url_direct, title, company,
+                location, job_type, employment_type, date_posted,
+                salary_source, interval, min_amount, max_amount,
+                currency, is_remote, job_level, job_function, company_industry,
+                listing_type, emails, description, company_url,
                 company_url_direct, company_addresses, company_num_employees,
-                company_revenue, company_description, logo_photo_url, banner_photo_url,
+                company_revenue, company_description,
+                logo_photo_url, banner_photo_url,
                 ceo_name, ceo_photo_url, salary_range, job_link
             )
         )
@@ -156,7 +160,8 @@ def load_jobs(JOBS_FILE):
 
 
 def insert_jobs_into_db():
-    """Reads job data and inserts it into the database while avoiding duplicates."""
+    """Reads job data and inserts it into the
+    database while avoiding duplicates."""
     jobs1 = load_jobs(JOBS_FILE1)
     jobs2 = load_jobs(JOBS_FILE2)
 
